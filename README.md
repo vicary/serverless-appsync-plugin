@@ -93,6 +93,73 @@ appSync:
 
 To upgrade form [v1](https://github.com/sid88in/serverless-appsync-plugin/tree/v1) of this plugin, [follow this guide](doc/upgrading-from-v1.md)
 
+# Custom domains
+
+AppSync [supports custom domains](https://aws.amazon.com/blogs/mobile/introducing-custom-domain-names-for-aws-appsync-apis/).
+
+You need to generate and provide a valid certificate ARN for the domain (Note: Taht certificate ust be in the `us-east-1` region, no matter where you deploy your AppSync API).
+
+example:
+
+```yaml
+custom:
+  appSync:
+    domain:
+      name: api.example.com
+      certificateArn: arn:aws:acm:us-east-1123456789:certificate/1c4e4c36-9a63-4685-94b7-e873402baca3
+      route53:
+        hostedZoneId: ABCDEFGHIJKLMN # optional. If not provided, the plugin will try to find the best match from the domain name
+        hostedZoneName: example.com # optional. If not provided, the plugin will try to find the best match from the domain name
+```
+
+Domains are managed trhough the CLI commands. This allows a better flexibility and control over your domains and APIs.
+
+e.g. You can swap one API with another on a domain easily (for blue/green deployments)
+
+Note: This is currently only supported for one API. If you have multiple APIs in your stack, the first one will be used.
+
+## Create/delete a domain
+
+Before associating a domain to an API, you must first create it. You can do so using the following command.
+
+```bash
+sls appsync-domain create
+```
+
+And to delete it:
+
+```bash
+sls appsync-domain delete
+```
+
+If an API is associated to it, you will need to disassociate it first.
+
+## Associate/disassociate an API to the domain
+
+```bash
+sls appsync-domain assoc --stage dev
+```
+
+You can associate an API to a domain that already has another API attached to it. The old API will be replaced by the new one.
+
+To disassociate an API from the domain, use
+
+```bash
+sls appsync-domain disassoc --stage dev
+```
+
+## Create/delete a route53 record
+
+If you use Route53 for your hosted zone, you can also manage the CNAME record for your custom domain easily using the following commands.
+
+```bash
+sls appsync-domain create-record
+```
+
+```bash
+sls appsync-domain delete-record
+```
+
 # Contributing
 
 If you have any questions, issue, feature request, please feel free to [open an issue](/issues/new).
