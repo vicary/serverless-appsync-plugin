@@ -12,7 +12,7 @@ Deploy [AppSync](https://aws.amazon.com/appsync) API's in minutes using this [Se
 
 # Installation
 
-```
+```bash
 npm install serverless-appsync-plugin --save-dev
 ```
 
