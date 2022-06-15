@@ -97,7 +97,7 @@ To upgrade form [v1](https://github.com/sid88in/serverless-appsync-plugin/tree/v
 
 AppSync [supports custom domains](https://aws.amazon.com/blogs/mobile/introducing-custom-domain-names-for-aws-appsync-apis/).
 
-You need to generate and provide a valid certificate ARN for the domain (Note: Taht certificate ust be in the `us-east-1` region, no matter where you deploy your AppSync API).
+You need to generate and provide a valid certificate ARN for the domain (Note: The certificate must be in the `us-east-1` region, no matter where you deploy your AppSync API).
 
 example:
 
