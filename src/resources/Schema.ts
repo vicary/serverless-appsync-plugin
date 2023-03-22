@@ -1,13 +1,13 @@
-import globby from 'globby';
+import { convertAppSyncSchemas } from 'appsync-schema-converter';
 import fs from 'fs';
+import globby from 'globby';
+import { parse } from 'graphql';
+import { validateSDL } from 'graphql/validation/validate';
+import { flatten } from 'lodash';
 import path from 'path';
+import ServerlessError from 'serverless/lib/serverless-error';
 import { CfnResources } from '../types/cloudFormation';
 import { Api } from './Api';
-import { flatten } from 'lodash';
-import { parse, print } from 'graphql';
-import ServerlessError from 'serverless/lib/serverless-error';
-import { validateSDL } from 'graphql/validation/validate';
-import { mergeTypeDefs } from '@graphql-tools/merge';
 
 const AWS_TYPES = `
 directive @aws_iam on FIELD_DEFINITION | OBJECT
@@ -69,21 +69,6 @@ export class Schema {
 
     this.valdiateSchema(AWS_TYPES + '\n' + schemas.join('\n'));
 
-    // Return single files as-is.
-    if (schemas.length === 1) {
-      return schemas[0];
-    }
-
-    // AppSync does not support Object extensions
-    // https://spec.graphql.org/October2021/#sec-Object-Extensions
-    // Merge the schemas
-    return print(
-      mergeTypeDefs(schemas, {
-        forceSchemaDefinition: false,
-        useSchemaDefinition: false,
-        sort: true,
-        throwOnConflict: true,
-      }),
-    );
+    return convertAppSyncSchemas(schemas);
   }
 }

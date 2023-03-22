@@ -31,19 +31,15 @@ describe('schema', () => {
         createUser(post: UserInput!): User!
       }
 
-      \\"\\"\\"
-      A User
-      \\"\\"\\"
+      # A User
       type User {
         id: ID!
         name: String!
       }
 
-      # Input for user
       input UserInput {
         name: String!
-      }
-      ",
+      }",
           },
           "Type": "AWS::AppSync::GraphQLSchema",
         },
@@ -59,26 +55,14 @@ describe('schema', () => {
       'src/__tests__/fixtures/schemas/multiple/post.graphql',
     ]);
     expect(schema.generateSchema()).toMatchInlineSnapshot(`
-      "type Mutation {
-        createPost(post: PostInput!): Post!
-        createUser(post: UserInput!): User!
-      }
-
-      type Post @aws_oidc {
-        id: ID!
-        title: String!
-        createdAt: AWSDateTime!
-        updatedAt: AWSDateTime!
-      }
-
-      \\"\\"\\"This is a description\\"\\"\\"
-      input PostInput {
-        title: String!
-      }
-
-      type Query {
-        getPost(id: ID!): Post!
+      "type Query {
         getUser: User!
+        getPost(id: ID!): Post!
+      }
+
+      type Mutation {
+        createUser(post: UserInput!): User!
+        createPost(post: PostInput!): Post!
       }
 
       type User {
@@ -91,6 +75,18 @@ describe('schema', () => {
 
       input UserInput {
         name: String!
+      }
+
+      type Post @aws_oidc {
+        id: ID!
+        title: String!
+        createdAt: AWSDateTime!
+        updatedAt: AWSDateTime!
+      }
+
+      # This is a description
+      input PostInput {
+        title: String!
       }"
     `);
   });
@@ -101,19 +97,14 @@ describe('schema', () => {
       'src/__tests__/fixtures/schemas/multiple/*.graphql',
     ]);
     expect(schema.generateSchema()).toMatchInlineSnapshot(`
-      "type Mutation {
-        createPost(post: PostInput!): Post!
-        createUser(post: UserInput!): User!
-      }
-
-      type Post @aws_oidc {
+      "type Post @aws_oidc {
         id: ID!
         title: String!
         createdAt: AWSDateTime!
         updatedAt: AWSDateTime!
       }
 
-      \\"\\"\\"This is a description\\"\\"\\"
+      # This is a description
       input PostInput {
         title: String!
       }
@@ -121,6 +112,11 @@ describe('schema', () => {
       type Query {
         getPost(id: ID!): Post!
         getUser: User!
+      }
+
+      type Mutation {
+        createPost(post: PostInput!): Post!
+        createUser(post: UserInput!): User!
       }
 
       type User {
@@ -167,19 +163,15 @@ describe('schema', () => {
         createUser(post: UserInput!): User!
       }
 
-      \\"\\"\\"
-      A User
-      \\"\\"\\"
+      # A User
       type User {
         id: ID!
         name: String!
       }
 
-      # Input for user
       input UserInput {
         name: String!
-      }
-      "
+      }"
     `);
   });
 });
