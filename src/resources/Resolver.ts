@@ -77,12 +77,17 @@ export class Resolver {
         );
       }
 
-      const logicalIdDataSource =
-        this.api.naming.getDataSourceLogicalId(dataSource);
       Properties = {
         ...Properties,
         Kind: 'UNIT',
-        DataSourceName: { 'Fn::GetAtt': [logicalIdDataSource, 'Name'] },
+        DataSourceName: this.api.config.apiId
+          ? dataSource
+          : {
+              'Fn::GetAtt': [
+                this.api.naming.getDataSourceLogicalId(dataSource),
+                'Name',
+              ],
+            },
         MaxBatchSize: this.config.maxBatchSize,
       };
     } else {
