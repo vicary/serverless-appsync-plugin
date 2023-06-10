@@ -27,7 +27,7 @@ export type AppSyncConfig = {
   additionalAuthentications?: Auth[];
   domain?: DomainConfig;
   apiKeys?: Record<string, ApiKeyConfig>;
-  dataSources: Record<string, DataSourceConfig>;
+  dataSources?: Record<string, DataSourceConfig>;
   resolvers: Record<string, ResolverConfig>;
   pipelineFunctions: Record<string, PipelineFunctionConfig>;
   substitutions?: Substitutions;

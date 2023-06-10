@@ -556,7 +556,9 @@ export class Api {
   }
 
   hasDataSource(name: string) {
-    return name in this.config.dataSources;
+    return (
+      this.config.dataSources === undefined || name in this.config.dataSources
+    );
   }
 
   hasPipelineFunction(name: string) {
