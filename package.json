@@ -46,6 +46,7 @@
     "appsync-schema-converter": "^2.1.4",
     "aws-sdk": "^2.1265.0",
     "chalk": "^4.1.2",
+    "change-case": "^4.1.2",
     "globby": "^11.1.0",
     "graphql": "^16.6.0",
     "lodash": "^4.17.21",
