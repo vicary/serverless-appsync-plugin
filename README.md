@@ -5,6 +5,13 @@
 
 Deploy [AppSync](https://aws.amazon.com/appsync) API's in minutes using this [Serverless](https://www.serverless.com/) plugin.
 
+# Notice
+
+This is a fork of the original `serverless-appsync-plugin` with two modifications:
+
+1. A new option `appSync.apiId` to support an existing AppSync API.
+2. Replace the schema conversion with `appsync-schema-converter`.
+
 # Minimum requirements
 
 - [Node.js v16 or higher](https://nodejs.org)

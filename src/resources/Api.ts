@@ -1,5 +1,6 @@
-import ServerlessAppsyncPlugin from '..';
 import { forEach, isEmpty, merge, set } from 'lodash';
+import { DateTime, Duration } from 'luxon';
+import ServerlessAppsyncPlugin from '..';
 import {
   CfnResource,
   CfnResources,
@@ -11,18 +12,17 @@ import {
   Auth,
   CognitoAuth,
   DataSourceConfig,
-  PipelineFunctionConfig,
   LambdaAuth,
   LambdaConfig,
   OidcAuth,
+  PipelineFunctionConfig,
   ResolverConfig,
 } from '../types/plugin';
 import { getHostedZoneName, parseDuration } from '../utils';
-import { DateTime, Duration } from 'luxon';
-import { Naming } from './Naming';
 import { DataSource } from './DataSource';
-import { Resolver } from './Resolver';
+import { Naming } from './Naming';
 import { PipelineFunction } from './PipelineFunction';
+import { Resolver } from './Resolver';
 import { Schema } from './Schema';
 import { Waf } from './Waf';
 
@@ -68,6 +68,10 @@ export class Api {
   }
 
   compileEndpoint(): CfnResources {
+    if (this.config.apiId) {
+      return {};
+    }
+
     const logicalId = this.naming.getApiLogicalId();
 
     const endpointResource: CfnResource = {
@@ -84,7 +88,7 @@ export class Api {
       this.compileAuthenticationProvider(this.config.authentication),
     );
 
-    if (this.config.additionalAuthentications.length > 0) {
+    if (this.config.additionalAuthentications?.length) {
       merge(endpointResource.Properties, {
         AdditionalAuthenticationProviders:
           this.config.additionalAuthentications?.map((provider) =>
@@ -183,6 +187,8 @@ export class Api {
   }
 
   compileSchema() {
+    if (!this.config.schema) return;
+
     const schema = new Schema(this, this.config.schema);
     return schema.compile();
   }
@@ -280,9 +286,9 @@ export class Api {
 
   compileLambdaAuthorizerPermission(): CfnResources {
     const lambdaAuth = [
-      ...this.config.additionalAuthentications,
+      ...(this.config.additionalAuthentications ?? []),
       this.config.authentication,
-    ].find(({ type }) => type === 'AWS_LAMBDA') as LambdaAuth | undefined;
+    ].find((auth) => auth?.type === 'AWS_LAMBDA') as LambdaAuth | undefined;
 
     if (!lambdaAuth) {
       return {};
@@ -405,10 +411,11 @@ export class Api {
   }
 
   getApiId() {
-    const logicalIdGraphQLApi = this.naming.getApiLogicalId();
-    return {
-      'Fn::GetAtt': [logicalIdGraphQLApi, 'ApiId'],
-    };
+    return (
+      this.config.apiId || {
+        'Fn::GetAtt': [this.naming.getApiLogicalId(), 'ApiId'],
+      }
+    );
   }
 
   getUserPoolConfig(auth: CognitoAuth, isAdditionalAuth = false) {
@@ -472,27 +479,26 @@ export class Api {
     }));
   }
 
-  compileAuthenticationProvider(provider: Auth, isAdditionalAuth = false) {
-    const { type } = provider;
-    const authPrivider = {
-      AuthenticationType: type,
+  compileAuthenticationProvider(provider?: Auth, isAdditionalAuth = false) {
+    const authProvider = {
+      AuthenticationType: provider?.type,
     };
 
-    if (type === 'AMAZON_COGNITO_USER_POOLS') {
-      merge(authPrivider, {
+    if (provider?.type === 'AMAZON_COGNITO_USER_POOLS') {
+      merge(authProvider, {
         UserPoolConfig: this.getUserPoolConfig(provider, isAdditionalAuth),
       });
-    } else if (type === 'OPENID_CONNECT') {
-      merge(authPrivider, {
+    } else if (provider?.type === 'OPENID_CONNECT') {
+      merge(authProvider, {
         OpenIDConnectConfig: this.getOpenIDConnectConfig(provider),
       });
-    } else if (type === 'AWS_LAMBDA') {
-      merge(authPrivider, {
+    } else if (provider?.type === 'AWS_LAMBDA') {
+      merge(authProvider, {
         LambdaAuthorizerConfig: this.getLambdaAuthorizerConfig(provider),
       });
     }
 
-    return authPrivider;
+    return authProvider;
   }
 
   getLambdaArn(config: LambdaConfig, embededFunctionName: string) {

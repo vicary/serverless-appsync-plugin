@@ -1,3 +1,5 @@
+import { forEach, merge } from 'lodash';
+import { A, O } from 'ts-toolbelt';
 import {
   ApiKeyConfig,
   AppSyncConfig,
@@ -5,8 +7,6 @@ import {
   PipelineFunctionConfig,
   ResolverConfig,
 } from './types/plugin';
-import { A, O } from 'ts-toolbelt';
-import { forEach, merge } from 'lodash';
 
 /* Completely replaces keys of O1 with those of O */
 type Replace<O extends object, O1 extends object> = O.Merge<
@@ -77,6 +77,8 @@ const toResourceName = (name: string) => {
 export const getAppSyncConfig = (config: AppSyncConfigInput): AppSyncConfig => {
   const schema = Array.isArray(config.schema)
     ? config.schema
+    : config.apiId
+    ? undefined
     : [config.schema || 'schema.graphql'];
 
   const dataSources: Record<string, DataSourceConfig> = {};
@@ -167,7 +169,7 @@ export const getAppSyncConfig = (config: AppSyncConfigInput): AppSyncConfig => {
 
   let apiKeys: Record<string, ApiKeyConfig> | undefined;
   if (
-    config.authentication.type === 'API_KEY' ||
+    config.authentication?.type === 'API_KEY' ||
     additionalAuthentications.some((auth) => auth.type === 'API_KEY')
   ) {
     const inputKeys = config.apiKeys || [];

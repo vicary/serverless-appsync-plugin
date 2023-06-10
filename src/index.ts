@@ -1,18 +1,8 @@
-import { writeText, log, progress } from '@serverless/utils/log';
-import Serverless from 'serverless/lib/Serverless';
-import Provider from 'serverless/lib/plugins/aws/provider.js';
-import { forEach, last, merge } from 'lodash';
-import { getAppSyncConfig } from './getAppSyncConfig';
-import { GraphQLError } from 'graphql';
-import { DateTime } from 'luxon';
-import chalk from 'chalk';
-import path from 'path';
-import open from 'open';
-import fs from 'fs';
+import { log, progress, writeText } from '@serverless/utils/log';
 import {
-  DescribeStackResourcesInput,
-  DescribeStackResourcesOutput,
-} from 'aws-sdk/clients/cloudformation';
+  ListCertificatesRequest,
+  ListCertificatesResponse,
+} from 'aws-sdk/clients/acm';
 import {
   AssociateApiRequest,
   AssociateApiResponse,
@@ -33,25 +23,13 @@ import {
   ListApiKeysResponse,
 } from 'aws-sdk/clients/appsync';
 import {
-  CommandsDefinition,
-  Hook,
-  VariablesSourcesDefinition,
-  VariableSourceResolver,
-} from 'serverless';
+  DescribeStackResourcesInput,
+  DescribeStackResourcesOutput,
+} from 'aws-sdk/clients/cloudformation';
 import {
-  FilterLogEventsResponse,
   FilterLogEventsRequest,
+  FilterLogEventsResponse,
 } from 'aws-sdk/clients/cloudwatchlogs';
-import { AppSyncValidationError, validateConfig } from './validation';
-import {
-  confirmAction,
-  getHostedZoneName,
-  getWildCardDomainName,
-  parseDateTimeOrDuration,
-  wait,
-} from './utils';
-import { Api } from './resources/Api';
-import { Naming } from './resources/Naming';
 import {
   ChangeResourceRecordSetsRequest,
   ChangeResourceRecordSetsResponse,
@@ -60,11 +38,33 @@ import {
   ListHostedZonesByNameRequest,
   ListHostedZonesByNameResponse,
 } from 'aws-sdk/clients/route53';
+import chalk from 'chalk';
+import fs from 'fs';
+import { GraphQLError } from 'graphql';
+import { forEach, last, merge } from 'lodash';
+import { DateTime } from 'luxon';
+import open from 'open';
+import path from 'path';
 import {
-  ListCertificatesRequest,
-  ListCertificatesResponse,
-} from 'aws-sdk/clients/acm';
+  CommandsDefinition,
+  Hook,
+  VariableSourceResolver,
+  VariablesSourcesDefinition,
+} from 'serverless';
+import Serverless from 'serverless/lib/Serverless';
+import Provider from 'serverless/lib/plugins/aws/provider.js';
 import terminalLink from 'terminal-link';
+import { AppSyncConfigInput, getAppSyncConfig } from './getAppSyncConfig';
+import { Api } from './resources/Api';
+import { Naming } from './resources/Naming';
+import {
+  confirmAction,
+  getHostedZoneName,
+  getWildCardDomainName,
+  parseDateTimeOrDuration,
+  wait,
+} from './utils';
+import { AppSyncValidationError, validateConfig } from './validation';
 
 const CONSOLE_BASE_URL = 'https://console.aws.amazon.com';
 
@@ -297,12 +297,14 @@ class ServerlessAppsyncPlugin {
     this.hooks = {
       'after:aws:info:gatherData': () => this.gatherData(),
       'after:aws:info:displayServiceInfo': () => {
+        if (this.api?.config.apiId) return;
+
         this.displayEndpoints();
         this.displayApiKeys();
       },
       // Commands
-      'appsync:validate-schema:run': () => {
-        this.loadConfig();
+      'appsync:validate-schema:run': async () => {
+        await this.loadConfig();
         this.validateSchemas();
         log.success('AppSync schema valid');
       },
@@ -337,15 +339,19 @@ class ServerlessAppsyncPlugin {
       'before:package:initialize',
       'before:aws:info:gatherData',
     ].forEach((hook) => {
-      this.hooks[hook] = () => {
-        this.loadConfig();
+      this.hooks[hook] = async () => {
+        await this.loadConfig();
         this.buildAndAppendResources();
       };
     });
   }
 
   async getApiId() {
-    this.loadConfig();
+    if (this.api?.config.apiId) {
+      return this.api?.config.apiId;
+    }
+
+    await this.loadConfig();
 
     if (!this.naming) {
       throw new this.serverless.classes.Error(
@@ -363,7 +369,7 @@ class ServerlessAppsyncPlugin {
       LogicalResourceId: logicalIdGraphQLApi,
     });
 
-    const apiId = last(StackResources?.[0]?.PhysicalResourceId?.split('/'));
+    const apiId = StackResources?.[0]?.PhysicalResourceId?.split('/').pop();
 
     if (!apiId) {
       throw new this.serverless.classes.Error(
@@ -503,7 +509,7 @@ class ServerlessAppsyncPlugin {
   }
 
   async initDomainCommand() {
-    this.loadConfig();
+    await this.loadConfig();
     const domain = this.getDomain();
 
     if (domain.useCloudFormation !== false) {
@@ -943,10 +949,14 @@ class ServerlessAppsyncPlugin {
     }
   }
 
-  loadConfig() {
-    log.info('Loading AppSync config');
+  async loadConfig() {
+    log.debug('Loading AppSync config');
 
     const { appSync } = this.serverless.configurationInput;
+
+    if (appSync.apiId) {
+      await this.mergeRemoteConfig(appSync);
+    }
 
     try {
       validateConfig(appSync);
@@ -960,6 +970,23 @@ class ServerlessAppsyncPlugin {
     const config = getAppSyncConfig(appSync);
     this.naming = new Naming(appSync.name);
     this.api = new Api(config, this);
+  }
+
+  async mergeRemoteConfig(appSync: AppSyncConfigInput) {
+    if (!appSync.apiId) return;
+
+    const { graphqlApi } = await this.provider.request<
+      GetGraphqlApiRequest,
+      GetGraphqlApiResponse
+    >('AppSync', 'getGraphqlApi', { apiId: appSync.apiId });
+
+    if (!graphqlApi?.name) {
+      throw new this.serverless.classes.Error(
+        'Unable to retrieve GraphQL API name, please provide a valid apiId.',
+      );
+    }
+
+    appSync.name = graphqlApi.name;
   }
 
   validateSchemas() {
@@ -1000,8 +1027,8 @@ class ServerlessAppsyncPlugin {
     );
   }
 
-  public resolveVariable: VariableSourceResolver = ({ address }) => {
-    this.loadConfig();
+  public resolveVariable: VariableSourceResolver = async ({ address }) => {
+    await this.loadConfig();
 
     if (!this.naming) {
       throw new this.serverless.classes.Error(
