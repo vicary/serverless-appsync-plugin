@@ -1,14 +1,3 @@
-import { log, progress, writeText } from '@serverless/utils/log';
-import Serverless from 'serverless/lib/Serverless';
-import Provider from 'serverless/lib/plugins/aws/provider.js';
-import { forEach, last, merge } from 'lodash';
-import { getAppSyncConfig } from './getAppSyncConfig';
-import { GraphQLError } from 'graphql';
-import { DateTime } from 'luxon';
-import chalk from 'chalk';
-import path from 'path';
-import open from 'open';
-import fs from 'fs';
 import {
   ListCertificatesRequest,
   ListCertificatesResponse,
