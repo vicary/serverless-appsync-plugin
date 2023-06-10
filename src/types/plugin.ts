@@ -20,10 +20,11 @@ import {
 export * from './common';
 
 export type AppSyncConfig = {
+  apiId?: string;
   name: string;
-  schema: string[];
-  authentication: Auth;
-  additionalAuthentications: Auth[];
+  schema?: string[];
+  authentication?: Auth;
+  additionalAuthentications?: Auth[];
   domain?: DomainConfig;
   apiKeys?: Record<string, ApiKeyConfig>;
   dataSources: Record<string, DataSourceConfig>;
