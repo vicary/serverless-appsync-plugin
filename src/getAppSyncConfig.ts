@@ -41,7 +41,7 @@ export type AppSyncConfigInput = Replace<
     pipelineFunctions?:
       | Record<string, FunctionConfigInput>[]
       | Record<string, FunctionConfigInput>;
-    dataSources:
+    dataSources?:
       | Record<string, DataSourceConfigInput>[]
       | Record<string, DataSourceConfigInput>;
   },
