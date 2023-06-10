@@ -1,7 +1,7 @@
 import Ajv from 'ajv';
 import ajvErrors from 'ajv-errors';
-import ajvMergePatch from 'ajv-merge-patch';
 import addFormats from 'ajv-formats';
+import ajvMergePatch from 'ajv-merge-patch';
 import { timeUnits } from './utils';
 
 const AUTH_TYPES = [
@@ -632,6 +632,7 @@ export const appSyncSchema = {
     },
   },
   properties: {
+    apiId: { type: 'string' },
     name: { type: 'string' },
     authentication: { $ref: '#/definitions/auth' },
     schema: {
@@ -861,7 +862,7 @@ export const appSyncSchema = {
       errorMessage: 'must be an esbuild config object or false',
     },
   },
-  required: ['name', 'authentication'],
+  oneOf: [{ required: ['apiId'] }, { required: ['name', 'authentication'] }],
   additionalProperties: {
     not: true,
     errorMessage: 'invalid (unknown) property',

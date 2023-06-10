@@ -10,7 +10,7 @@ describe('variable', () => {
         options: {},
         resolveVariable: () => '',
       }),
-    ).toMatchInlineSnapshot(`
+    ).resolves.toMatchInlineSnapshot(`
       Object {
         "value": Object {
           "Fn::GetAtt": Array [
@@ -29,7 +29,7 @@ describe('variable', () => {
         options: {},
         resolveVariable: () => '',
       }),
-    ).toMatchInlineSnapshot(`
+    ).resolves.toMatchInlineSnapshot(`
       Object {
         "value": Object {
           "Fn::GetAtt": Array [
@@ -48,7 +48,7 @@ describe('variable', () => {
         options: {},
         resolveVariable: () => '',
       }),
-    ).toMatchInlineSnapshot(`
+    ).resolves.toMatchInlineSnapshot(`
       Object {
         "value": Object {
           "Fn::GetAtt": Array [
@@ -67,7 +67,7 @@ describe('variable', () => {
         options: {},
         resolveVariable: () => '',
       }),
-    ).toMatchInlineSnapshot(`
+    ).resolves.toMatchInlineSnapshot(`
       Object {
         "value": Object {
           "Fn::GetAtt": Array [

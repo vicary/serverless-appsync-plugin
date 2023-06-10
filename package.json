@@ -1,10 +1,10 @@
 {
-  "name": "serverless-appsync-plugin",
+  "name": "@vicary/serverless-appsync-plugin",
   "version": "0.0.0-development",
   "description": "AWS AppSync support for the Serverless Framework",
   "main": "lib/index.js",
   "types": "lib/types/index.d.ts",
-  "repository": "https://github.com/sid88in/serverless-appsync-plugin",
+  "repository": "https://github.com/vicary/serverless-appsync-plugin",
   "license": "MIT",
   "files": [
     "/lib"
@@ -17,7 +17,7 @@
     "prepare": "rm -rf lib && npm run build"
   },
   "devDependencies": {
-    "@serverless/test": "^9.0.0",
+    "@serverless/test": "^11.1.1",
     "@serverless/typescript": "^2.71.0",
     "@types/jest": "^27.5.2",
     "@types/luxon": "^2.4.0",
@@ -30,7 +30,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "jest": "^27.5.1",
     "prettier": "^2.8.0",
-    "semantic-release": "^19.0.5",
+    "semantic-release": "^21.0.3",
     "serverless": "^3.25.1",
     "ts-jest": "^27.1.5",
     "ts-node": "^10.9.1",
@@ -43,6 +43,7 @@
     "ajv-errors": "^3.0.0",
     "ajv-formats": "^2.1.1",
     "ajv-merge-patch": "^5.0.1",
+    "appsync-schema-converter": "^2.1.4",
     "aws-sdk": "^2.1265.0",
     "chalk": "^4.1.2",
     "esbuild": "^0.17.11",

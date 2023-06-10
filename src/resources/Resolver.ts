@@ -1,14 +1,15 @@
+import path from 'path';
 import {
   CfnResolver,
+  CfnResource,
   CfnResources,
   IntrinsicFunction,
 } from '../types/cloudFormation';
 import { ResolverConfig } from '../types/plugin';
 import { Api } from './Api';
-import path from 'path';
+import { JsResolver } from './JsResolver';
 import { MappingTemplate } from './MappingTemplate';
 import { SyncConfig } from './SyncConfig';
-import { JsResolver } from './JsResolver';
 
 // A decent default for pipeline JS resolvers
 const DEFAULT_JS_RESOLVERS = `
@@ -117,15 +118,18 @@ export class Resolver {
       this.config.type,
       this.config.field,
     );
-    const logicalIdGraphQLSchema = this.api.naming.getSchemaLogicalId();
 
-    return {
-      [logicalIdResolver]: {
-        Type: 'AWS::AppSync::Resolver',
-        DependsOn: [logicalIdGraphQLSchema],
-        Properties,
-      },
+    const resource: CfnResource = {
+      Type: 'AWS::AppSync::Resolver',
+      DependsOn: [],
+      Properties,
     };
+
+    if (this.api.config.schema?.length) {
+      resource.DependsOn?.push(this.api.naming.getSchemaLogicalId());
+    }
+
+    return { [logicalIdResolver]: resource };
   }
 
   resolveJsCode = (filePath: string): string | IntrinsicFunction => {

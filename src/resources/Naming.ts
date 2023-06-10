@@ -1,3 +1,4 @@
+import { pascalCase } from 'change-case';
 import {
   DataSourceConfig,
   PipelineFunctionConfig,
@@ -104,6 +105,6 @@ export class Naming {
   }
 
   getAuthenticationEmbeddedLamdbaName() {
-    return `${this.apiName}Authorizer`;
+    return pascalCase(`${this.apiName.replace(/[^\w]/, ' ')}Authorizer`);
   }
 }
