@@ -1,3 +1,4 @@
+import path from 'path';
 import {
   CfnFunctionResolver,
   CfnResources,
@@ -5,10 +6,9 @@ import {
 } from '../types/cloudFormation';
 import { PipelineFunctionConfig } from '../types/plugin';
 import { Api } from './Api';
-import path from 'path';
+import { JsResolver } from './JsResolver';
 import { MappingTemplate } from './MappingTemplate';
 import { SyncConfig } from './SyncConfig';
-import { JsResolver } from './JsResolver';
 
 export class PipelineFunction {
   constructor(private api: Api, private config: PipelineFunctionConfig) {}
@@ -24,14 +24,18 @@ export class PipelineFunction {
     const logicalId = this.api.naming.getPipelineFunctionLogicalId(
       this.config.name,
     );
-    const logicalIdDataSource = this.api.naming.getDataSourceLogicalId(
-      this.config.dataSource,
-    );
 
     const Properties: CfnFunctionResolver['Properties'] = {
       ApiId: this.api.getApiId(),
       Name: this.config.name,
-      DataSourceName: { 'Fn::GetAtt': [logicalIdDataSource, 'Name'] },
+      DataSourceName: this.api.config.apiId
+        ? this.config.dataSource
+        : {
+            'Fn::GetAtt': [
+              this.api.naming.getDataSourceLogicalId(this.config.dataSource),
+              'Name',
+            ],
+          },
       Description: this.config.description,
       FunctionVersion: '2018-05-29',
       MaxBatchSize: this.config.maxBatchSize,
