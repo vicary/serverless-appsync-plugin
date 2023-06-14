@@ -556,7 +556,9 @@ export class Api {
   }
 
   hasDataSource(name: string) {
-    return this.config.apiId || name in (this.config.dataSources ?? {});
+    const ds = this.config.dataSources;
+
+    return ds !== undefined && name in ds;
   }
 
   hasPipelineFunction(name: string) {
