@@ -71,7 +71,10 @@ export class Resolver {
 
     if (this.config.kind === 'UNIT') {
       const { dataSource } = this.config;
-      if (!this.api.hasDataSource(dataSource)) {
+      const isExternalAPI = Boolean(this.api.config.apiId);
+      const dataSourceInStack = this.api.hasDataSource(dataSource);
+
+      if (!isExternalAPI && !dataSourceInStack) {
         throw new this.api.plugin.serverless.classes.Error(
           `Resolver '${this.config.type}.${this.config.field}' references unknown DataSource '${dataSource}'`,
         );
@@ -80,14 +83,14 @@ export class Resolver {
       Properties = {
         ...Properties,
         Kind: 'UNIT',
-        DataSourceName: this.api.config.apiId
-          ? dataSource
-          : {
+        DataSourceName: dataSourceInStack
+          ? {
               'Fn::GetAtt': [
-                this.api.naming.getDataSourceLogicalId(dataSource),
+                this.api.naming.getDataSourceLogicalId(this.config.dataSource),
                 'Name',
               ],
-            },
+            }
+          : this.config.dataSource,
         MaxBatchSize: this.config.maxBatchSize,
       };
     } else {
