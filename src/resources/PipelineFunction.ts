@@ -15,7 +15,10 @@ export class PipelineFunction {
 
   compile(): CfnResources {
     const { dataSource, code } = this.config;
-    if (!this.api.hasDataSource(dataSource)) {
+    const isExternalAPI = Boolean(this.api.config.apiId);
+    const dataSourceInStack = this.api.hasDataSource(dataSource);
+
+    if (!isExternalAPI && !dataSourceInStack) {
       throw new this.api.plugin.serverless.classes.Error(
         `Pipeline Function '${this.config.name}' references unknown DataSource '${dataSource}'`,
       );
@@ -28,14 +31,14 @@ export class PipelineFunction {
     const Properties: CfnFunctionResolver['Properties'] = {
       ApiId: this.api.getApiId(),
       Name: this.config.name,
-      DataSourceName: this.api.config.apiId
-        ? this.config.dataSource
-        : {
+      DataSourceName: dataSourceInStack
+        ? {
             'Fn::GetAtt': [
               this.api.naming.getDataSourceLogicalId(this.config.dataSource),
               'Name',
             ],
-          },
+          }
+        : this.config.dataSource,
       Description: this.config.description,
       FunctionVersion: '2018-05-29',
       MaxBatchSize: this.config.maxBatchSize,
