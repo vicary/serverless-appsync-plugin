@@ -109,6 +109,12 @@ export class Api {
       });
     }
 
+    if (this.config.visibility) {
+      merge(endpointResource.Properties, {
+        Visibility: this.config.visibility,
+      });
+    }
+
     const resources = {
       [logicalId]: endpointResource,
     };
