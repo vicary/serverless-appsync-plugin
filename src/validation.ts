@@ -133,7 +133,7 @@ export const appSyncSchema = {
         iatTTL: { type: 'number' },
         authTTL: { type: 'number' },
       },
-      required: ['issuer', 'clientId'],
+      required: ['issuer'],
     },
     iamAuth: {
       type: 'object',
@@ -678,6 +678,14 @@ export const appSyncSchema = {
       },
     },
     xrayEnabled: { type: 'boolean' },
+    visibility: {
+      type: 'string',
+      enum: ['GLOBAL', 'PRIVATE'],
+      errorMessage: 'must be "GLOBAL" or "PRIVATE"',
+    },
+    introspection: { type: 'boolean' },
+    queryDepthLimit: { type: 'integer', minimum: 1, maximum: 75 },
+    resolverCountLimit: { type: 'integer', minimum: 1, maximum: 1000 },
     substitutions: { $ref: '#/definitions/substitutions' },
     waf: {
       type: 'object',
@@ -832,6 +840,15 @@ export const appSyncSchema = {
         },
       ],
       errorMessage: 'contains invalid pipeline function definitions',
+    },
+    esbuild: {
+      oneOf: [
+        {
+          type: 'object',
+        },
+        { const: false },
+      ],
+      errorMessage: 'must be an esbuild config object or false',
     },
   },
   required: ['name', 'authentication'],

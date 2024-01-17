@@ -1,33 +1,37 @@
 import { BuildOptions } from 'esbuild';
 import {
-  Auth,
-  DomainConfig,
   ApiKeyConfig,
-  LoggingConfig,
-  CachingConfig,
-  WafConfig,
-  SyncConfig,
-  DsHttpConfig,
-  DsDynamoDBConfig,
-  DsRelationalDbConfig,
-  DsOpenSearchConfig,
-  DsLambdaConfig,
-  DsEventBridgeConfig,
-  DsNone,
+  Auth,
   Substitutions,
+  CachingConfig,
+  DomainConfig,
+  LoggingConfig,
+  WafConfig,
+  DsDynamoDBConfig,
+  DsEventBridgeConfig,
+  DsHttpConfig,
+  DsLambdaConfig,
+  DsNone,
+  DsOpenSearchConfig,
+  DsRelationalDbConfig,
+  SyncConfig,
 } from './common';
 export * from './common';
 
 export type AppSyncConfig = {
   name: string;
-  schema: string[];
+  schema?: string | string[];
   authentication: Auth;
-  additionalAuthentications: Auth[];
+  additionalAuthentications?: Auth[];
   domain?: DomainConfig;
-  apiKeys?: Record<string, ApiKeyConfig>;
-  dataSources: Record<string, DataSourceConfig>;
-  resolvers: Record<string, ResolverConfig>;
-  pipelineFunctions: Record<string, PipelineFunctionConfig>;
+  apiKeys?: (ApiKeyConfig | string)[];
+  resolvers?: Record<string, ResolverConfig>[] | Record<string, ResolverConfig>;
+  pipelineFunctions?:
+    | Record<string, PipelineFunctionConfig>[]
+    | Record<string, PipelineFunctionConfig>;
+  dataSources:
+    | Record<string, DataSourceConfig>[]
+    | Record<string, DataSourceConfig>;
   substitutions?: Substitutions;
   xrayEnabled?: boolean;
   logging?: LoggingConfig;
@@ -42,8 +46,8 @@ export type AppSyncConfig = {
 };
 
 export type BaseResolverConfig = {
-  field: string;
-  type: string;
+  field?: string;
+  type?: string;
   request?: string | false;
   response?: string | false;
   code?: string;
@@ -61,17 +65,16 @@ export type ResolverConfig = UnitResolverConfig | PipelineResolverConfig;
 
 export type UnitResolverConfig = BaseResolverConfig & {
   kind: 'UNIT';
-  dataSource: string;
+  dataSource: string | DataSourceConfig;
   maxBatchSize?: number;
 };
 
 export type PipelineResolverConfig = BaseResolverConfig & {
   kind?: 'PIPELINE';
-  functions: string[];
+  functions: (string | PipelineFunctionConfig)[];
 };
 
 export type DataSourceConfig = {
-  name: string;
   description?: string;
 } & (
   | DsHttpConfig
@@ -84,8 +87,7 @@ export type DataSourceConfig = {
 );
 
 export type PipelineFunctionConfig = {
-  name: string;
-  dataSource: string;
+  dataSource: string | DataSourceConfig;
   description?: string;
   code?: string;
   request?: string;
@@ -94,4 +96,3 @@ export type PipelineFunctionConfig = {
   substitutions?: Substitutions;
   sync?: SyncConfig;
 };
-export { Substitutions };
