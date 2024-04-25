@@ -53,9 +53,10 @@ import {
 import Serverless from 'serverless/lib/Serverless';
 import Provider from 'serverless/lib/plugins/aws/provider.js';
 import terminalLink from 'terminal-link';
-import { AppSyncConfigInput, getAppSyncConfig } from './getAppSyncConfig';
+import { getAppSyncConfig } from './getAppSyncConfig';
 import { Api } from './resources/Api';
 import { Naming } from './resources/Naming';
+import { AppSyncConfig } from './types';
 import {
   confirmAction,
   getHostedZoneName,
@@ -999,7 +1000,7 @@ class ServerlessAppsyncPlugin {
     this.api = new Api(config, this);
   }
 
-  async mergeRemoteConfig(appSync: AppSyncConfigInput) {
+  async mergeRemoteConfig(appSync: AppSyncConfig) {
     if (!appSync.apiId) return;
 
     const { graphqlApi } = await this.provider.request<

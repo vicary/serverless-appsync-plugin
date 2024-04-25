@@ -20,6 +20,7 @@ import {
 export * from './common';
 
 export type AppSyncConfig = {
+  apiId?: string;
   name: string;
   schema?: string | string[];
   authentication: Auth;

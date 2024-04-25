@@ -1,4 +1,8 @@
-import { CfnWafRuleStatement, IntrinsicFunction } from './cloudFormation';
+import {
+  CfnWafAction,
+  CfnWafRuleStatement,
+  IntrinsicFunction,
+} from './cloudFormation';
 
 export type IamStatement = {
   Effect: 'Allow' | 'Deny';
@@ -49,6 +53,7 @@ export type WafRuleCustom = {
   name: string;
   priority?: number;
   action?: WafRuleAction;
+  overrideAction?: CfnWafAction;
   statement: CfnWafRuleStatement;
   visibilityConfig?: VisibilityConfig;
   overrideAction?: Record<string, unknown>;
