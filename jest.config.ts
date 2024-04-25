@@ -6,7 +6,12 @@ const config: Config.InitialOptions = {
   testEnvironment: 'node',
   silent: true,
   moduleDirectories: ['node_modules', 'src'],
-  transformIgnorePatterns: ['[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$'],
+  transformIgnorePatterns: [
+    '[/\\\\]node_modules[/\\\\](?!change-case|axios).+\\.(js|jsx|ts|tsx)$',
+  ],
+  transform: {
+    '^.+\\.(js|jsx|ts|tsx)$': 'ts-jest',
+  },
 };
 
 export default config;
