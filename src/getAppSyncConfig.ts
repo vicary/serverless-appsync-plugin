@@ -1,12 +1,12 @@
+import { forEach, merge } from 'lodash';
 import { AppSyncConfig } from './types';
 import {
   ApiKeyConfig,
-  AppSyncConfig as PluginAppSyncConfig,
   DataSourceConfig,
   PipelineFunctionConfig,
+  AppSyncConfig as PluginAppSyncConfig,
   ResolverConfig,
 } from './types/plugin';
-import { forEach, merge } from 'lodash';
 
 const flattenMaps = <T>(
   input?: Record<string, T> | Record<string, T>[],
@@ -132,7 +132,7 @@ export const getAppSyncConfig = (
 
   let apiKeys: Record<string, ApiKeyConfig> | undefined;
   if (
-    config.authentication?.type === 'API_KEY' ||
+    config.authentication.type === 'API_KEY' ||
     additionalAuthentications.some((auth) => auth.type === 'API_KEY')
   ) {
     const inputKeys = config.apiKeys || [];
