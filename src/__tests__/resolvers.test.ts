@@ -49,6 +49,7 @@ describe('Resolvers', () => {
             {
               path: 'path/to/file',
               contents: Uint8Array.from([]),
+              hash: '',
               text: `Bundled content of ${`${config.entryPoints?.[0]}`.replace(
                 /\\/g,
                 '/',

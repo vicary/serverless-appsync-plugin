@@ -89,16 +89,13 @@ export class Resolver {
         );
       }
 
+      const logicalIdDataSource =
+        this.api.naming.getDataSourceLogicalId(dataSource);
       Properties = {
         ...Properties,
         Kind: 'UNIT',
         DataSourceName: dataSourceInStack
-          ? {
-              'Fn::GetAtt': [
-                this.api.naming.getDataSourceLogicalId(this.config.dataSource),
-                'Name',
-              ],
-            }
+          ? { 'Fn::GetAtt': [logicalIdDataSource, 'Name'] }
           : this.config.dataSource,
         MaxBatchSize: this.config.maxBatchSize,
       };

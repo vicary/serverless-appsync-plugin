@@ -1,7 +1,7 @@
 import Ajv from 'ajv';
 import ajvErrors from 'ajv-errors';
-import addFormats from 'ajv-formats';
 import ajvMergePatch from 'ajv-merge-patch';
+import addFormats from 'ajv-formats';
 import { timeUnits } from './utils';
 
 const AUTH_TYPES = [
