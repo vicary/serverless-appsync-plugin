@@ -2,39 +2,26 @@
   "name": "@vicary/serverless-appsync-plugin",
   "version": "0.0.0-development",
   "description": "AWS AppSync support for the Serverless Framework",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vicary/serverless-appsync-plugin.git"
+  },
+  "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/types/index.d.ts",
-  "repository": "https://github.com/vicary/serverless-appsync-plugin",
-  "license": "MIT",
   "files": [
     "/lib"
   ],
   "scripts": {
-    "test": "jest src/__tests__/.*\\.test\\.ts",
-    "test:watch": "jest src/__tests__/.*\\.test\\.ts --watch",
     "build": "tsc",
     "lint": "eslint . && tsc --noEmit",
-    "prepare": "rm -rf lib && npm run build"
+    "prepare": "rm -rf lib && npm run build",
+    "test": "jest src/__tests__/.*\\.test\\.ts",
+    "test:watch": "jest src/__tests__/.*\\.test\\.ts --watch"
   },
-  "devDependencies": {
-    "@serverless/test": "^11.1.1",
-    "@serverless/typescript": "^2.71.0",
-    "@types/jest": "^27.5.2",
-    "@types/luxon": "^2.4.0",
-    "@typescript-eslint/eslint-plugin": "^5.45.0",
-    "@typescript-eslint/parser": "^5.45.0",
-    "all-contributors-cli": "^6.24.0",
-    "eslint": "^8.28.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "jest": "^27.5.1",
-    "prettier": "^2.8.0",
-    "semantic-release": "^24.2.5",
-    "serverless": "^3.40.0",
-    "ts-jest": "^27.1.5",
-    "ts-node": "^10.9.1",
-    "typescript": "^4.9.3"
+  "overrides": {
+    "conventional-commits-filter": "^5.0.0",
+    "conventional-commits-parser": "^6.0.0"
   },
   "dependencies": {
     "@graphql-tools/merge": "^8.3.12",
@@ -54,6 +41,27 @@
     "luxon": "^2.5.0",
     "open": "^8.4.0",
     "terminal-link": "^2.1.1"
+  },
+  "devDependencies": {
+    "@serverless/test": "^11.1.1",
+    "@serverless/typescript": "^2.71.0",
+    "@types/jest": "^27.5.2",
+    "@types/luxon": "^2.4.0",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "all-contributors-cli": "^6.24.0",
+    "eslint": "^8.28.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "husky": "^9.1.7",
+    "jest": "^27.5.1",
+    "prettier": "^2.8.0",
+    "semantic-release": "^24.2.5",
+    "serverless": "^3.40.0",
+    "ts-jest": "^27.1.5",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.3"
   },
   "peerDependencies": {
     "serverless": ">=3.0.0"

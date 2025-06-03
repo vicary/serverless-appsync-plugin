@@ -1,0 +1,1 @@
+npx -y sort-package-json -q && git add package.json
